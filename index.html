@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tính Lợi Nhuận Shopee | Pro Calculator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-hover: #f1f5f9;
+    --surface-dark: #0f172a;
+    --border: #e2e8f0;
+    --border-focus: #ee4d2d;
+    --text: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+
+    --accent: #ee4d2d;
+    --accent-light: #ffece7;
+    --accent-dark: #d3401f;
+
+    --green: #10b981;
+    --green-light: #d1fae5;
+    --green-dark: #065f46;
+
+    --red: #ef4444;
+    --red-light: #fee2e2;
+    --red-dark: #991b1b;
+
+    --amber: #f59e0b;
+    --amber-light: #fef3c7;
+    --amber-dark: #92400e;
+
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg: #0b1220;
+      --surface: #111827;
+      --surface-hover: #1f2937;
+      --border: #24304a;
+      --text: #e5e7eb;
+      --text-secondary: #a3adc2;
+      --text-muted: #6b7688;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1220;
+    --surface: #111827;
+    --surface-hover: #1f2937;
+    --border: #24304a;
+    --text: #e5e7eb;
+    --text-secondary: #a3adc2;
+    --text-muted: #6b7688;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, #ee4d2d 0%, #ff7337 100%);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(238, 77, 45, 0.25);
+  }
+  .logo-text h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .logo-text span {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .header-nav {
+    display: flex;
+    gap: 8px;
+  }
+  .nav-btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+  }
+  .nav-btn:hover { background: var(--surface-hover); color: var(--text); }
+  .nav-btn.active { background: var(--accent-light); color: var(--accent-dark); }
+  .nav-btn svg { width: 18px; height: 18px; stroke-width: 2; fill: none; }
+
+  /* LAYOUT */
+  .main { max-width: 1520px; margin: 0 auto; padding: 2rem; }
+
+  /* PAGE */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: linear-gradient(to bottom, var(--surface), var(--bg));
+    flex-wrap: wrap;
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; }
+  .card-body { padding: 1.5rem; }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .select-wrap, .search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .select-wrap label, .search-wrap label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  select, input[type=number], input[type=text] {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: var(--transition);
+  }
+  select:focus, input[type=number]:focus, input[type=text]:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.15);
+  }
+
+  input[type=number] { -moz-appearance: textfield; }
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface-hover); border-color: var(--text-muted); color: var(--text); }
+  .btn svg { width: 16px; height: 16px; stroke-width: 2; fill: none; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); color: #fff; }
+
+  .btn-danger { color: var(--red); }
+  .btn-danger:hover { background: var(--red-light); border-color: var(--red); color: var(--red-dark); }
+
+  /* FILE UPLOAD */
+  .upload-area {
+    border: 2px dashed var(--text-muted);
+    border-radius: var(--radius);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 1.5rem;
+    background: var(--bg);
+    display: block;
+  }
+  .upload-area.dragover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    box-shadow: 0 0 0 4px rgba(238, 77, 45, 0.1);
+  }
+  .upload-area input { display: none; }
+  .upload-icon { width: 44px; height: 44px; stroke: var(--text-secondary); margin: 0 auto 12px; display: block; fill: none; transition: var(--transition); }
+  .upload-area.dragover .upload-icon { stroke: var(--accent-dark); transform: scale(1.1); }
+  .upload-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+  .upload-hint { font-size: 12px; color: var(--text-muted); }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); max-width: 100%; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+  th {
+    background: var(--surface-hover);
+    padding: 12px 14px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+  }
+  th:first-child { text-align: left; }
+  th.text-center { text-align: center; }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    color: var(--text);
+    vertical-align: middle;
+    transition: var(--transition);
+  }
+  td:first-child { text-align: left; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+
+  .td-input {
+    width: 100%;
+    border: 1px solid transparent;
+    background: none;
+    text-align: inherit;
+    font-size: 13px;
+    color: var(--text);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: var(--transition);
+  }
+  .td-input:focus {
+    border-color: var(--border-focus);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .td-select {
+    padding: 4px 8px;
+    font-size: 12px;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    outline: none;
+    font-weight: 500;
+    color: var(--text);
+  }
+  tr:hover .td-select {
+    border-color: var(--border);
+    background: var(--surface);
+  }
+  .td-select:focus {
+    border-color: var(--border-focus);
+    background: var(--surface);
+  }
+
+  /* PROFIT & MARGIN */
+  .profit-cell {
+    padding: 8px 10px;
+    line-height: 1.3;
+  }
+  .profit-val {
+    font-weight: 700;
+    font-size: 13px;
+    display: block;
+  }
+  .margin-val {
+    font-size: 10px;
+    font-weight: 600;
+    display: inline-block;
+    padding: 1px 4px;
+    border-radius: 4px;
+    margin-top: 2px;
+  }
+
+  .profit-pos { color: var(--green-dark); }
+  .profit-pos .margin-val { background: var(--green-light); color: var(--green-dark); }
+
+  .profit-neg { color: var(--red-dark); }
+  .profit-neg .margin-val { background: var(--red-light); color: var(--red-dark); }
+
+  .profit-zero { color: var(--text-muted); }
+  .profit-zero .margin-val { background: var(--border); color: var(--text-secondary); }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--text-muted);
+  }
+  .empty-state svg { width: 48px; height: 48px; stroke: var(--text-muted); fill: none; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto; }
+
+  /* SUMMARY */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px;
+    margin-top: 1.5rem;
+  }
+  .summary-card {
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    transition: var(--transition);
+  }
+  .summary-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .summary-label { font-size: 11px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .summary-value { font-size: 18px; font-weight: 800; color: var(--text); }
+  .summary-subtext { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+  .summary-value.pos { color: var(--green-dark); }
+  .summary-value.neg { color: var(--red-dark); }
+
+  /* CONFIG PAGE */
+  .config-layout { display: grid; grid-template-columns: 220px 1fr; gap: 2rem; }
+  @media (max-width: 768px) { .config-layout { grid-template-columns: 1fr; gap: 1.5rem; } }
+  .gian-list { display: flex; flex-direction: column; gap: 6px; }
+  .gian-item {
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .gian-item:hover { background: var(--surface-hover); color: var(--text); }
+  .gian-item.active {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+  }
+  .gian-item svg { width: 18px; height: 18px; fill: none; flex-shrink: 0; }
+
+  .config-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .config-table th {
+    background: var(--surface-hover);
+    padding: 12px 10px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 700;
+    text-align: center;
+    position: static;
+  }
+  .config-table th:first-child { text-align: left; }
+  .config-table td {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    text-align: center;
+    vertical-align: middle;
+    background: var(--surface);
+  }
+  .config-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    background: var(--bg);
+  }
+  .config-table input[type=number] {
+    width: 80px;
+    text-align: center;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  .pct { font-size: 12px; color: var(--text-muted); margin-left: 4px; font-weight: 600; }
+
+  .save-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    right: 24px;
+    background: var(--surface-dark);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    z-index: 1000;
+    max-width: calc(100vw - 48px);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast svg { width: 18px; height: 18px; stroke: var(--green); fill: none; stroke-width: 2.5; flex-shrink: 0; }
+
+  .hint-bar {
+    background: var(--amber-light);
+    border: 1px solid var(--amber);
+    border-radius: var(--radius-sm);
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--amber-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+  .hint-bar svg { width: 18px; height: 18px; flex-shrink: 0; stroke: var(--amber-dark); fill: none; }
+  .hint-bar a { color: var(--accent-dark); text-decoration: underline; cursor: pointer; font-weight: 600; }
+
+  .row-actions { display: flex; gap: 4px; justify-content: center; }
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    transition: var(--transition);
+  }
+  .action-btn:hover { background: var(--bg); color: var(--text); }
+  .action-btn.btn-del:hover { background: var(--red-light); color: var(--red); }
+  .action-btn svg { width: 16px; height: 16px; stroke-width: 2; fill: none; }
+
+  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">₫</div>
+    <div class="logo-text">
+      <h1>Profit Pro</h1>
+      <span>Shopee Calculator</span>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <button class="nav-btn active" onclick="switchPage('calc', this)">
+      <svg viewBox="0 0 24 24" stroke="currentColor"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
+      Tính lợi nhuận
+    </button>
+    <button class="nav-btn" onclick="switchPage('config', this)">
+      <svg viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+      Cấu hình chi phí
+    </button>
+  </nav>
+</header>
+
+<main class="main">
+
+  <!-- PAGE: TÍNH LỢI NHUẬN -->
+  <div id="page-calc" class="page active">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+          Sản phẩm bán hàng
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="addRow()">
+            <svg viewBox="0 0 24 24" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Thêm dòng
+          </button>
+          <button class="btn" onclick="exportExcel()" style="color:var(--green-dark);border-color:var(--green);background:var(--green-light)">
+            <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Xuất Excel
+          </button>
+          <button class="btn btn-danger" onclick="clearRows()">
+            <svg viewBox="0 0 24 24" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+            Xoá tất cả
+          </button>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="select-wrap">
+              <label>Ngành mặc định:</label>
+              <select id="sel-nganh" onchange="updateDefaultNganh()">
+                <option>Sách</option>
+                <option>Tranh</option>
+                <option>Lịch</option>
+                <option>Decal</option>
+                <option>Trà</option>
+              </select>
+            </div>
+            <div class="search-wrap" style="margin-left: 10px;">
+              <input type="text" id="txt-search" placeholder="Tìm tên sản phẩm..." oninput="renderTable()" style="width: 220px;">
+            </div>
+          </div>
+        </div>
+
+        <label class="upload-area" id="upload-zone">
+          <input type="file" id="file-input" accept=".xlsx,.xls" onchange="handleFile(this)">
+          <svg class="upload-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div class="upload-text"><strong>Kéo thả file vào đây</strong> hoặc bấm để chọn file từ máy tính</div>
+          <div class="upload-hint">Định dạng hỗ trợ: .xlsx, .xls — Các cột: Tên sản phẩm, Phân loại, Giá vốn, Giá bán, Ngành (không bắt buộc)</div>
+        </label>
+
+        <div class="hint-bar">
+          <svg viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Tải tệp tin cấu trúc chuẩn để điền dữ liệu hàng loạt: <a onclick="downloadTemplate()">Tải file Excel mẫu tại đây</a></span>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr id="table-head-row">
+                <th style="min-width:180px;text-align:left">Tên sản phẩm</th>
+                <th style="min-width:90px;text-align:left">Phân loại</th>
+                <th style="min-width:95px;text-align:left">Ngành hàng</th>
+                <th style="min-width:105px">Giá vốn (đ)</th>
+                <th style="min-width:105px">Giá bán (đ)</th>
+                <!-- gian columns injected by JS -->
+                <th style="width:70px" class="text-center">Tác vụ</th>
+              </tr>
+            </thead>
+            <tbody id="product-tbody">
+              <tr>
+                <td colspan="12" class="empty-state">
+                  <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  Chưa có sản phẩm nào. Vui lòng kéo thả file Excel hoặc click "Thêm dòng".
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Summary -->
+        <div id="summary" style="display:none">
+          <div class="divider"></div>
+          <div class="section-label">Báo cáo tổng kết</div>
+          <div class="summary-grid" id="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Tổng số sản phẩm</div>
+              <div class="summary-value" id="sum-count">0</div>
+              <div class="summary-subtext">Đơn vị: Sản phẩm</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Tổng tiền vốn</div>
+              <div class="summary-value" id="sum-cost">0</div>
+              <div class="summary-subtext">Tổng vốn nhập kho</div>
+            </div>
+            <!-- per-gian summary cards injected by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: CẤU HÌNH -->
+  <div id="page-config" class="page">
+    <div style="margin-bottom:1.5rem">
+      <h2 style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px">Thiết lập tham số chi phí</h2>
+      <div style="font-size:14px;color:var(--text-secondary)">Điều chỉnh % phí sàn Shopee theo từng gian hàng và ngành hàng tương ứng. Các % này có thể thay đổi theo thời gian, chỉnh xong bấm "Lưu cấu hình".</div>
+      <div id="last-updated-text" style="font-size:13px;color:var(--green-dark);font-weight:600;margin-top:8px;display:none;"></div>
+    </div>
+    <div class="config-layout">
+      <!-- Sidebar -->
+      <div class="card" style="padding:1rem;height:fit-content">
+        <div class="section-label" style="margin-bottom:12px">Gian hàng kinh doanh</div>
+        <div class="gian-list" id="gian-list"></div>
+      </div>
+
+      <!-- Config table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" id="config-card-title">
+            <svg viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            Bảng phí chi tiết
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x:auto">
+            <table class="config-table">
+              <thead>
+                <tr>
+                  <th>Khoản mục chi phí</th>
+                  <th>Sách</th>
+                  <th>Tranh</th>
+                  <th>Lịch</th>
+                  <th>Decal</th>
+                  <th>Trà</th>
+                </tr>
+              </thead>
+              <tbody id="config-tbody"></tbody>
+            </table>
+          </div>
+          <div class="save-row">
+            <button class="btn btn-primary" onclick="saveConfig()">
+              <svg viewBox="0 0 24 24" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+              Lưu cấu hình
+            </button>
+            <button class="btn" onclick="applyToAllGian()">
+              <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              Áp dụng bảng này cho cả 6 gian
+            </button>
+            <button class="btn" onclick="resetConfig()">
+              <svg viewBox="0 0 24 24" stroke="currentColor"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+              Đặt lại mặc định
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-text">Lưu thay đổi thành công!</span>
+</div>
+
+<script>
+// ============ CONSTANTS ============
+const GIANS = ['Nhà Sách','CN1','CN2','Tường Vip','Tranh Vip','Tường Vip New'];
+const GIAN_ICON = `<svg viewBox="0 0 24 24" stroke="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`;
+const GIAN_COLORS = {
+  'Nhà Sách':      {bg:'#ecfdf5', fg:'#047857', border:'#a7f3d0'},
+  'CN1':           {bg:'#f0f9ff', fg:'#0369a1', border:'#bae6fd'},
+  'CN2':           {bg:'#f5f3ff', fg:'#6d28d9', border:'#ddd6fe'},
+  'Tường Vip':     {bg:'#fffbeb', fg:'#b45309', border:'#fde68a'},
+  'Tranh Vip':     {bg:'#fdf2f8', fg:'#be185d', border:'#fbcfe8'},
+  'Tường Vip New': {bg:'#f0fdfa', fg:'#0f766e', border:'#99f6e4'},
+};
+const GIAN_SHORT = {
+  'Nhà Sách':'ns', 'CN1':'cn1', 'CN2':'cn2',
+  'Tường Vip':'tv', 'Tranh Vip':'trv', 'Tường Vip New':'tvn'
+};
+const NGANHS = ['Sách','Tranh','Lịch','Decal','Trà'];
+const COST_KEYS = [
+  {key:'phi_co_dinh',    label:'Phí cố định (%)'},
+  {key:'voucher_xtra',   label:'Voucher Xtra (%)'},
+  {key:'phi_ha_tang',    label:'Phí hạ tầng (đ)', isFixed:true},
+  {key:'phi_xu_ly',      label:'Phí xử lý giao dịch (%)'},
+  {key:'phi_dich_vu',    label:'Phí dịch vụ (%)'},
+  {key:'quang_cao',      label:'Quảng cáo (%)'},
+  {key:'voucher_shop',   label:'Voucher shop (%)'},
+  {key:'aff',            label:'Aff (%)'},
+  {key:'phi_hoan_vcktc', label:'Phí VC hoàn/VCKTC (%)'},
+];
+
+function defaultConfig() {
+  // Cấu hình mặc định theo số liệu chị cung cấp — có thể chỉnh lại trong trang "Cấu hình chi phí"
+  const base = {
+    voucher_xtra: 5.5,
+    phi_ha_tang: 3000,
+    phi_xu_ly: 6,
+    phi_dich_vu: 7.5,
+    quang_cao: 8.2,
+    voucher_shop: 1.2,
+    aff: 2,
+    phi_hoan_vcktc: 0.5,
+  };
+  const phiCoDinhByNganh = { 'Lịch': 18.7, 'Tranh': 19.1, 'Decal': 19.1, 'Sách': 19.1, 'Trà': 19.1 };
+  const cfg = {};
+  GIANS.forEach(g => {
+    cfg[g] = {};
+    NGANHS.forEach(n => {
+      cfg[g][n] = Object.assign({ phi_co_dinh: phiCoDinhByNganh[n] }, base);
+    });
+  });
+  return cfg;
+}
+
+// ============ STATE ============
+let config = defaultConfig();
+let products = loadProductsLocal();
+let currentGian = GIANS[0];
+let defaultNganhVal = 'Sách';
+
+
+// ============ LOCAL PRODUCT STORAGE (per-viewer) ============
+function loadProductsLocal() {
+  try {
+    const p = localStorage.getItem('shopee_profit_products');
+    return p ? JSON.parse(p) : [];
+  } catch(e) { return []; }
+}
+function saveProductsLocal() {
+  try { localStorage.setItem('shopee_profit_products', JSON.stringify(products)); } catch(e) {}
+}
+
+// ============ CONFIG LƯU CỤC BỘ TRÊN TRÌNH DUYỆT (localStorage) ============
+function loadConfigLocal() {
+  try {
+    const raw = localStorage.getItem('shopee_profit_config');
+    if (raw) {
+      const saved = JSON.parse(raw);
+      if (saved && Object.keys(saved).length) config = saved;
+    }
+  } catch(e) {}
+  renderConfig();
+  renderTable();
+  updateLastUpdatedUI();
+}
+
+function persistConfig(cfg) {
+  try {
+    localStorage.setItem('shopee_profit_config', JSON.stringify(cfg));
+    showToast('Đã lưu cấu hình phí thành công!');
+  } catch(e) {
+    showToast('Lỗi khi lưu cấu hình!', false);
+  }
+}
+
+// ============ PAGE SWITCH ============
+function switchPage(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  if (page === 'config') renderConfig();
+}
+
+// ============ TOAST ============
+function showToast(text, success = true) {
+  const toast = document.getElementById('toast');
+  const toastText = document.getElementById('toast-text');
+  toastText.textContent = text;
+  const icon = toast.querySelector('svg');
+  icon.style.stroke = success ? 'var(--green)' : 'var(--red)';
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ============ BUILD GIAN SIDEBAR & TABLE HEADERS (dynamic, 6 gian) ============
+function buildGianSidebar() {
+  const list = document.getElementById('gian-list');
+  list.innerHTML = GIANS.map((g, i) => `
+    <div class="gian-item ${i===0?'active':''}" data-gian="${g}" onclick="selectGian('${g}', this)">
+      ${GIAN_ICON}
+      ${g}
+    </div>
+  `).join('');
+}
+
+function buildTableHead() {
+  const headRow = document.getElementById('table-head-row');
+  const actionTh = headRow.lastElementChild;
+  GIANS.forEach(g => {
+    const c = GIAN_COLORS[g];
+    const th = document.createElement('th');
+    th.textContent = g;
+    th.style.background = c.bg;
+    th.style.color = c.fg;
+    th.style.borderBottom = `2px solid ${c.border}`;
+    th.style.minWidth = '108px';
+    headRow.insertBefore(th, actionTh);
+  });
+}
+
+function buildSummaryCards() {
+  const grid = document.getElementById('summary-grid');
+  GIANS.forEach(g => {
+    const c = GIAN_COLORS[g];
+    const key = GIAN_SHORT[g];
+    const card = document.createElement('div');
+    card.className = 'summary-card';
+    card.style.borderTop = `4px solid ${c.fg}`;
+    card.innerHTML = `
+      <div class="summary-label">TB LN ${g}</div>
+      <div class="summary-value" id="sum-${key}">0</div>
+      <div class="summary-subtext">Lợi nhuận trung bình / SP</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ============ CONFIG PAGE ============
+function selectGian(gian, el) {
+  currentGian = gian;
+  document.querySelectorAll('.gian-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('config-card-title').innerHTML = `
+    <svg viewBox="0 0 24 24" stroke="currentColor" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    Bảng phí chi tiết — ${gian}
+  `;
+  renderConfig();
+}
+
+function updateLastUpdatedUI() {
+  const el = document.getElementById('last-updated-text');
+  if (config._lastUpdated) {
+    el.innerHTML = `<svg viewBox="0 0 24 24" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px;fill:none;stroke:currentColor;stroke-width:2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Cập nhật lần cuối: ${config._lastUpdated}`;
+    el.style.display = 'block';
+  }
+}
+
+function renderConfig() {
+  const tbody = document.getElementById('config-tbody');
+  tbody.innerHTML = '';
+  COST_KEYS.forEach(({key, label, isFixed}) => {
+    const tr = document.createElement('tr');
+    let cells = `<td>${label}</td>`;
+    NGANHS.forEach(n => {
+      const val = config[currentGian]?.[n]?.[key] ?? 0;
+      const maxAttr = isFixed ? '' : 'max="100"';
+      const unit = isFixed ? '<span class="pct">đ</span>' : '<span class="pct">%</span>';
+      cells += `<td>
+        <input type="number" min="0" ${maxAttr} step="${isFixed ? 500 : 0.1}" value="${val}"
+          data-gian="${currentGian}" data-nganh="${n}" data-key="${key}"
+          style="width:${isFixed ? 90 : 70}px">
+        ${unit}
+      </td>`;
+    });
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+}
+
+function readConfigInputsIntoState() {
+  document.querySelectorAll('#config-tbody input[type=number]').forEach(inp => {
+    const {gian, nganh, key} = inp.dataset;
+    if (!config[gian]) config[gian] = {};
+    if (!config[gian][nganh]) config[gian][nganh] = {};
+    config[gian][nganh][key] = parseFloat(inp.value) || 0;
+  });
+}
+
+function stampUpdated() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  const dateStr = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  config._lastUpdated = `${timeStr} - ${dateStr}`;
+}
+
+function saveConfig() {
+  readConfigInputsIntoState();
+  stampUpdated();
+  persistConfig(config);
+  renderTable();
+  updateLastUpdatedUI();
+}
+
+function applyToAllGian() {
+  readConfigInputsIntoState();
+  const source = JSON.parse(JSON.stringify(config[currentGian]));
+  GIANS.forEach(g => { config[g] = JSON.parse(JSON.stringify(source)); });
+  stampUpdated();
+  persistConfig(config);
+  renderConfig();
+  renderTable();
+  updateLastUpdatedUI();
+  showToast(`Đã áp dụng bảng phí của "${currentGian}" cho cả 6 gian!`);
+}
+
+function resetConfig() {
+  if (!confirm('Đặt lại về giá trị mặc định cho gian ' + currentGian + '?')) return;
+  const def = defaultConfig();
+  config[currentGian] = def[currentGian];
+  renderConfig();
+  showToast('Đã đặt lại cấu hình mặc định!');
+}
+
+// ============ CALCULATION LOGIC ============
+function getC(gian, nganh, key) {
+  return parseFloat(config[gian]?.[nganh]?.[key]) || 0;
+}
+
+function calcProfit(giaCost, giaBan, gian, nganh) {
+  const fixed = getC(gian, nganh, 'phi_ha_tang');
+  const pctSum =
+    getC(gian, nganh, 'phi_co_dinh') +
+    getC(gian, nganh, 'voucher_xtra') +
+    getC(gian, nganh, 'phi_xu_ly') +
+    getC(gian, nganh, 'phi_dich_vu') +
+    getC(gian, nganh, 'quang_cao') +
+    getC(gian, nganh, 'voucher_shop') +
+    getC(gian, nganh, 'aff') +
+    getC(gian, nganh, 'phi_hoan_vcktc');
+  return giaBan - giaCost - fixed - giaBan * (pctSum / 100);
+}
+
+function fmt(n) {
+  if (isNaN(n) || !isFinite(n)) return '—';
+  return Math.round(n).toLocaleString('vi-VN') + ' đ';
+}
+function fmtPct(profit, giaBan) {
+  if (!giaBan || isNaN(profit) || !isFinite(profit)) return '—';
+  const pct = (profit / giaBan * 100).toFixed(1);
+  return (pct >= 0 ? '+' : '') + pct + '%';
+}
+function profitClass(n) {
+  if (n > 0) return 'profit-pos';
+  if (n < 0) return 'profit-neg';
+  return 'profit-zero';
+}
+
+function updateDefaultNganh() {
+  defaultNganhVal = document.getElementById('sel-nganh').value;
+}
+
+// ============ RENDER PRODUCT TABLE ============
+function renderTable() {
+  const tbody = document.getElementById('product-tbody');
+  const searchQuery = document.getElementById('txt-search').value.toLowerCase().trim();
+  const colspan = 5 + GIANS.length + 1;
+
+  const filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(searchQuery) || (p.phanLoai && p.phanLoai.toLowerCase().includes(searchQuery))
+  );
+
+  if (!filteredProducts.length) {
+    if (products.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="${colspan}" class="empty-state">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Chưa có sản phẩm nào. Vui lòng kéo thả file Excel hoặc click "Thêm dòng".
+      </td></tr>`;
+    } else {
+      tbody.innerHTML = `<tr><td colspan="${colspan}" class="empty-state">
+        <svg viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Không tìm thấy sản phẩm phù hợp với từ khoá tìm kiếm.
+      </td></tr>`;
+    }
+    document.getElementById('summary').style.display = 'none';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  let totalCost = 0;
+
+  filteredProducts.forEach((p) => {
+    const originalIndex = products.indexOf(p);
+    const giaCost = parseFloat(p.giaCost) || 0;
+    const giaBan  = parseFloat(p.giaBan)  || 0;
+    const itemNganh = p.nganh || defaultNganhVal;
+    totalCost += giaCost;
+
+    let cells = `
+      <td><input class="td-input" type="text" value="${p.name}" onchange="updateProductField(${originalIndex}, 'name', this.value)" style="text-align:left;min-width:180px"></td>
+      <td><input class="td-input" type="text" value="${p.phanLoai||''}" onchange="updateProductField(${originalIndex}, 'phanLoai', this.value)" style="text-align:left;width:90px"></td>
+      <td>
+        <select class="td-select" onchange="updateProductField(${originalIndex}, 'nganh', this.value)">
+          ${NGANHS.map(n => `<option value="${n}" ${itemNganh === n ? 'selected' : ''}>${n}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="td-input" type="number" min="0" value="${p.giaCost}" onchange="updateProductField(${originalIndex}, 'giaCost', this.value)" style="text-align:right;width:95px"></td>
+      <td><input class="td-input" type="number" min="0" value="${p.giaBan}" onchange="updateProductField(${originalIndex}, 'giaBan', this.value)" style="text-align:right;width:95px;font-weight:600"></td>`;
+
+    GIANS.forEach(gian => {
+      const profit = calcProfit(giaCost, giaBan, gian, itemNganh);
+      cells += `
+        <td class="profit-cell ${profitClass(profit)}">
+          <span class="profit-val">${fmt(profit)}</span>
+          <span class="margin-val">${fmtPct(profit, giaBan)}</span>
+        </td>`;
+    });
+
+    cells += `
+      <td>
+        <div class="row-actions">
+          <button class="action-btn" onclick="cloneRow(${originalIndex})" title="Nhân bản dòng">
+            <svg viewBox="0 0 24 24" stroke="currentColor"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <button class="action-btn btn-del" onclick="removeRow(${originalIndex})" title="Xoá dòng">
+            <svg viewBox="0 0 24 24" stroke="currentColor"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+          </button>
+        </div>
+      </td>`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+
+  // SUMMARY
+  const n = products.length;
+  document.getElementById('sum-count').textContent = n;
+  document.getElementById('sum-cost').textContent = Math.round(totalCost).toLocaleString('vi-VN') + ' đ';
+
+  const totalByGian = {};
+  GIANS.forEach(g => totalByGian[g] = 0);
+
+  products.forEach(p => {
+    const giaCost = parseFloat(p.giaCost) || 0;
+    const giaBan  = parseFloat(p.giaBan)  || 0;
+    const itemNganh = p.nganh || defaultNganhVal;
+    GIANS.forEach(gian => {
+      const profit = calcProfit(giaCost, giaBan, gian, itemNganh);
+      if (isFinite(profit)) totalByGian[gian] += profit;
+    });
+  });
+
+  GIANS.forEach(gian => {
+    const key = GIAN_SHORT[gian];
+    const el = document.getElementById('sum-' + key);
+    if (!el) return;
+    const avg = n > 0 ? Math.round(totalByGian[gian] / n) : 0;
+    el.textContent = avg.toLocaleString('vi-VN') + ' đ';
+    el.className = 'summary-value ' + (avg >= 0 ? 'pos' : 'neg');
+  });
+
+  document.getElementById('summary').style.display = 'block';
+}
+
+// ============ PRODUCT CRUD ============
+function updateProductField(index, field, value) {
+  if (field === 'giaCost' || field === 'giaBan') {
+    products[index][field] = parseFloat(value) || 0;
+  } else {
+    products[index][field] = value;
+  }
+  saveProductsLocal();
+  renderTable();
+}
+
+function addRow() {
+  products.push({name:'Sản phẩm mới', phanLoai:'', giaCost:0, giaBan:0, nganh: defaultNganhVal});
+  saveProductsLocal();
+  renderTable();
+  showToast('Đã thêm sản phẩm mới!');
+}
+
+function cloneRow(i) {
+  const original = products[i];
+  products.splice(i + 1, 0, {
+    name: original.name + ' (Copy)',
+    phanLoai: original.phanLoai,
+    giaCost: original.giaCost,
+    giaBan: original.giaBan,
+    nganh: original.nganh
+  });
+  saveProductsLocal();
+  renderTable();
+  showToast('Đã nhân bản sản phẩm!');
+}
+
+function removeRow(i) {
+  products.splice(i, 1);
+  saveProductsLocal();
+  renderTable();
+  showToast('Đã xoá sản phẩm!');
+}
+
+function clearRows() {
+  if (products.length && !confirm('Bạn chắc chắn muốn xoá toàn bộ danh sách sản phẩm?')) return;
+  products = [];
+  saveProductsLocal();
+  renderTable();
+  showToast('Đã dọn sạch danh sách sản phẩm!');
+}
+
+// ============ EXCEL UPLOAD & DRAG-DROP ============
+const uploadZone = document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
+    const reader = new FileReader();
+    reader.onload = ev => parseExcel(ev.target.result);
+    reader.readAsArrayBuffer(file);
+  } else {
+    showToast('Định dạng tệp không hợp lệ! Vui lòng chọn file .xlsx hoặc .xls', false);
+  }
+});
+
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => parseExcel(e.target.result);
+  reader.readAsArrayBuffer(file);
+  input.value = '';
+}
+
+function parseExcel(arrayBuffer) {
+  try {
+    const wb = XLSX.read(arrayBuffer, {type: 'array'});
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, {defval: ''});
+    if (!rows.length) { showToast('File trống hoặc không có dữ liệu.', false); return; }
+
+    const keys = Object.keys(rows[0]).map(k => k.trim());
+    const findKey = (...terms) => keys.find(k => terms.some(t => k.toLowerCase().includes(t))) || null;
+
+    const nameKey  = findKey('tên', 'ten', 'name');
+    const loaiKey  = findKey('phân loại', 'loại', 'loai', 'phan');
+    const costKey  = findKey('giá vốn', 'gia von', 'vốn', 'von', 'cost');
+    const banKey   = findKey('giá bán', 'gia ban', 'bán', 'ban', 'sell', 'price');
+    const nganhKey = findKey('ngành', 'nganh', 'category');
+
+    const parsed = rows.map(r => {
+      let rawNganh = nganhKey ? String(r[nganhKey] || '').trim() : '';
+      let standardNganh = NGANHS.find(n => n.toLowerCase() === rawNganh.toLowerCase()) || defaultNganhVal;
+      return {
+        name:     String(r[nameKey] || r[keys[0]] || '').trim(),
+        phanLoai: loaiKey ? String(r[loaiKey] || '').trim() : '',
+        giaCost:  parseFloat(String(r[costKey] || r[keys[2]] || 0).replace(/[^\d.]/g,'')) || 0,
+        giaBan:   parseFloat(String(r[banKey]  || r[keys[3]] || 0).replace(/[^\d.]/g,'')) || 0,
+        nganh:    standardNganh
+      };
+    }).filter(p => p.name);
+
+    if (!parsed.length) { showToast('Không đọc được dữ liệu. Kiểm tra lại cấu trúc file mẫu!', false); return; }
+
+    products = [...products, ...parsed];
+    saveProductsLocal();
+    renderTable();
+    showToast(`Đã import thành công ${parsed.length} sản phẩm!`);
+  } catch(e) {
+    showToast('Lỗi đọc file Excel: ' + e.message, false);
+  }
+}
+
+function downloadTemplate() {
+  const data = [
+    ['Tên sản phẩm', 'Phân loại', 'Ngành hàng', 'Giá vốn', 'Giá bán'],
+    ['Sách ngoại văn Harry Potter', 'Bản đặc biệt', 'Sách', 120000, 250000],
+    ['Tranh treo tường Minimalist', 'Size A3', 'Tranh', 45000, 95000],
+    ['Trà hoa cúc thảo mộc', 'Hũ thủy tinh', 'Trà', 28000, 65000],
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!cols'] = [{wch:30},{wch:15},{wch:15},{wch:12},{wch:12}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sản phẩm');
+  XLSX.writeFile(wb, 'mau_san_pham_shopee.xlsx');
+}
+
+// ============ EXPORT EXCEL ============
+function exportExcel() {
+  if (!products.length) { showToast('Chưa có sản phẩm nào để xuất tệp!', false); return; }
+  const now = new Date();
+  const dateStr = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
+
+  const headerRow1 = ['Tên sản phẩm', 'Phân loại', 'Ngành hàng', 'Giá vốn (đ)', 'Giá bán (đ)', ...GIANS.map(g => `${g} (Lợi nhuận)`)];
+
+  const rows = products.map(p => {
+    const giaCost = parseFloat(p.giaCost) || 0;
+    const giaBan  = parseFloat(p.giaBan)  || 0;
+    const itemNganh = p.nganh || defaultNganhVal;
+    const row = [p.name, p.phanLoai||'', itemNganh, giaCost, giaBan];
+    GIANS.forEach(gian => row.push(Math.round(calcProfit(giaCost, giaBan, gian, itemNganh))));
+    return row;
+  });
+
+  const lastCol = 4 + GIANS.length;
+  const data = [
+    [`Bảng Tính Lợi Nhuận Shopee Toàn Diện — Xuất Ngày: ${dateStr}`],
+    [],
+    headerRow1,
+    ...rows
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  ws['!merges'] = [{s:{r:0,c:0}, e:{r:0,c:lastCol}}];
+  ws['!cols'] = [
+    {wch:35}, {wch:15}, {wch:12}, {wch:14}, {wch:14},
+    ...GIANS.map(() => ({wch:18}))
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Báo cáo lợi nhuận');
+  const fileName = `bao-cao-loi-nhuan-shopee_${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  showToast('Xuất file Excel thành công!');
+}
+
+// ============ INIT ============
+buildGianSidebar();
+buildTableHead();
+buildSummaryCards();
+loadConfigLocal();
+</script>
+</body>
+</html>
