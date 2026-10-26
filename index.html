@@ -812,27 +812,65 @@ function saveProductsLocal() {
   try { localStorage.setItem('shopee_profit_products', JSON.stringify(products)); } catch(e) {}
 }
 
-// ============ CONFIG LƯU CỤC BỘ TRÊN TRÌNH DUYỆT (localStorage) ============
-function loadConfigLocal() {
+// ============ CONFIG: GOOGLE APPS SCRIPT (nếu có) + localStorage dự phòng ============
+function isGas() {
+  return !!(typeof google !== 'undefined' && google.script && google.script.run);
+}
+
+function parseConfig(raw) {
   try {
-    const raw = localStorage.getItem('shopee_profit_config');
-    if (raw) {
-      const saved = JSON.parse(raw);
-      if (saved && Object.keys(saved).length) config = saved;
-    }
+    const cfg = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    if (cfg && typeof cfg === 'object' && !Array.isArray(cfg) && Object.keys(cfg).length) return cfg;
   } catch(e) {}
+  return null;
+}
+
+function saveConfigLocal(cfg) {
+  try {
+    localStorage.setItem('shopee_profit_config', JSON.stringify(cfg));
+    return true;
+  } catch(e) { return false; }
+}
+
+function applyLoadedConfig(cfg) {
+  config = cfg || defaultConfig();
   renderConfig();
   renderTable();
   updateLastUpdatedUI();
 }
 
-function persistConfig(cfg) {
-  try {
-    localStorage.setItem('shopee_profit_config', JSON.stringify(cfg));
-    showToast('Đã lưu cấu hình phí thành công!');
-  } catch(e) {
-    showToast('Lỗi khi lưu cấu hình!', false);
+function loadConfigFromLocal() {
+  let cfg = null;
+  try { cfg = parseConfig(localStorage.getItem('shopee_profit_config')); } catch(e) {}
+  applyLoadedConfig(cfg);
+}
+
+function loadConfig() {
+  // Hiển thị ngay bằng localStorage/mặc định; trong GAS sẽ thay bằng config từ server khi có
+  loadConfigFromLocal();
+  if (!isGas()) return;
+  google.script.run
+    .withSuccessHandler(raw => {
+      const cfg = parseConfig(raw);
+      if (!cfg) return;
+      saveConfigLocal(cfg);
+      applyLoadedConfig(cfg);
+    })
+    .withFailureHandler(() => {})
+    .getConfig();
+}
+
+function persistConfig(cfg, successMsg) {
+  const localOk = saveConfigLocal(cfg);
+  if (!isGas()) {
+    if (localOk) showToast(successMsg);
+    else showToast('Lỗi khi lưu cấu hình!', false);
+    return;
   }
+  google.script.run
+    .withSuccessHandler(() => showToast(successMsg))
+    .withFailureHandler(err => showToast('Lưu cấu hình lên Google thất bại: ' + (err && err.message ? err.message : err), false))
+    .saveConfig(JSON.stringify(cfg));
 }
 
 // ============ PAGE SWITCH ============
@@ -960,7 +998,7 @@ function stampUpdated() {
 function saveConfig() {
   readConfigInputsIntoState();
   stampUpdated();
-  persistConfig(config);
+  persistConfig(config, 'Đã lưu cấu hình phí thành công!');
   renderTable();
   updateLastUpdatedUI();
 }
@@ -970,11 +1008,10 @@ function applyToAllGian() {
   const source = JSON.parse(JSON.stringify(config[currentGian]));
   GIANS.forEach(g => { config[g] = JSON.parse(JSON.stringify(source)); });
   stampUpdated();
-  persistConfig(config);
+  persistConfig(config, `Đã áp dụng bảng phí của "${currentGian}" cho cả 6 gian!`);
   renderConfig();
   renderTable();
   updateLastUpdatedUI();
-  showToast(`Đã áp dụng bảng phí của "${currentGian}" cho cả 6 gian!`);
 }
 
 function resetConfig() {
@@ -1295,7 +1332,7 @@ function exportExcel() {
 buildGianSidebar();
 buildTableHead();
 buildSummaryCards();
-loadConfigLocal();
+loadConfig();
 </script>
 </body>
 </html>

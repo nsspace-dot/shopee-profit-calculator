@@ -24,3 +24,30 @@ Công cụ web một trang giúp tính nhanh lợi nhuận từng sản phẩm k
 ```
 Lợi nhuận = Giá bán − Giá vốn − Phí hạ tầng − Giá bán × (Tổng % các khoản phí)
 ```
+
+## Chạy trên Google Apps Script
+
+Khi chạy trong Apps Script (HtmlService), bảng phí được đồng bộ qua `google.script.run` để mọi người dùng chung một cấu hình; danh sách sản phẩm vẫn lưu trên trình duyệt. Mở trực tiếp file hoặc qua GitHub Pages thì chỉ dùng localStorage.
+
+1. Tạo project Apps Script, thêm file HTML tên `index` và dán nội dung `index.html` vào.
+2. Thêm file `Code.gs` (ví dụ lưu bằng PropertiesService):
+
+```js
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('index')
+    .setTitle('Tính Lợi Nhuận Shopee')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// Trả về chuỗi JSON cấu hình hoặc null
+function getConfig() {
+  return PropertiesService.getScriptProperties().getProperty('shopee_profit_config');
+}
+
+function saveConfig(json) {
+  JSON.parse(json); // kiểm tra hợp lệ
+  PropertiesService.getScriptProperties().setProperty('shopee_profit_config', json);
+}
+```
+
+3. Deploy → New deployment → Web app.
